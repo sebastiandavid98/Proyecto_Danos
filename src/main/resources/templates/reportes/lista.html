@@ -7,85 +7,123 @@
     <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
 </head>
 <body>
+<div class="layout">
 
-<nav class="navbar">
-    <a class="navbar-brand" th:href="@{/}">🔧 Reporte Daños</a>
-    <div class="navbar-links">
-        <a th:href="@{/reportes}">Reportes</a>
-        <a th:href="@{/reportes/nuevo}">Nuevo Reporte</a>
-        <a th:href="@{/usuarios}">Usuarios</a>
-    </div>
-</nav>
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <h2>🔧 Reporte Daños</h2>
+            <span>Sistema universitario</span>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">General</div>
+            <a th:href="@{/}"><span class="icon">📊</span> Dashboard</a>
+            <div class="nav-section">Gestión</div>
+            <a th:href="@{/reportes}" class="active"><span class="icon">📋</span> Todos los reportes</a>
+            <a th:href="@{/reportes/nuevo}"><span class="icon">➕</span> Nuevo reporte</a>
+            <div class="nav-section">Administración</div>
+            <a th:href="@{/usuarios}"><span class="icon">👥</span> Usuarios</a>
+            <a th:href="@{/usuarios/nuevo}"><span class="icon">👤</span> Nuevo usuario</a>
+        </nav>
+        <div class="sidebar-footer">Universidad · v1.0</div>
+    </aside>
 
-<div class="container">
+    <div class="main-wrapper">
+        <div class="topbar">
+            <span class="topbar-title">Reportes de daños</span>
+            <div class="topbar-actions">
+                <a th:href="@{/reportes/nuevo}" class="btn btn-primary btn-sm">➕ Nuevo reporte</a>
+            </div>
+        </div>
 
-    <!-- Mensaje de exito o error -->
-    <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
-    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+        <div class="main-content">
 
-    <div class="page-header">
-        <h1>📋 Reportes de Daños</h1>
-        <a th:href="@{/reportes/nuevo}" class="btn btn-primary">+ Nuevo Reporte</a>
-    </div>
+            <div th:if="${mensaje}" class="alert alert-success">✅ <span th:text="${mensaje}"></span></div>
+            <div th:if="${error}"   class="alert alert-error">❌ <span th:text="${error}"></span></div>
 
-    <!-- Sin reportes -->
-    <div th:if="${#lists.isEmpty(reportes)}" class="empty-state">
-        <p>No hay reportes registrados todavía.</p>
-        <a th:href="@{/reportes/nuevo}" class="btn btn-primary">Crear el primero</a>
-    </div>
-
-    <!-- Grid de tarjetas -->
-    <div class="cards-grid" th:unless="${#lists.isEmpty(reportes)}">
-        <div class="card" th:each="reporte : ${reportes}">
-
-            <div class="card-header">
-                <h3 th:text="${reporte.ubicacion.descripcion()}">Ubicacion</h3>
-                <!-- Badge de estado -->
-                <span th:with="est=${reporte.estado.class.simpleName}"
-                      th:classappend="${est == 'EstadoPendiente'   ? 'badge-pendiente'   :
-                                        est == 'EstadoEnRevision'  ? 'badge-revision'    :
-                                        est == 'EstadoEnProceso'   ? 'badge-proceso'     :
-                                        est == 'EstadoSolucionado' ? 'badge-solucionado' :
-                                                                      'badge-cerrado'}"
-                      class="badge"
-                      th:text="${est == 'EstadoPendiente'   ? 'Pendiente'   :
-                                  est == 'EstadoEnRevision'  ? 'En Revisión' :
-                                  est == 'EstadoEnProceso'   ? 'En Proceso'  :
-                                  est == 'EstadoSolucionado' ? 'Solucionado' :
-                                                               'Cerrado'}">
-                    Estado
-                </span>
+            <div class="page-header">
+                <div class="page-header-left">
+                    <h1>📋 Todos los reportes</h1>
+                    <p>Gestiona y da seguimiento a cada reporte registrado</p>
+                </div>
+                <div class="page-header-right">
+                    <a th:href="@{/reportes/nuevo}" class="btn btn-primary">➕ Nuevo reporte</a>
+                </div>
             </div>
 
-            <div class="card-body">
-                <p><strong>Categoría:</strong>
-                    <span th:text="${reporte.categoria.name().replace('_', ' ')}">cat</span>
-                </p>
-                <p><strong>Descripción:</strong>
-                    <span th:text="${#strings.abbreviate(reporte.descripcion, 80)}">desc</span>
-                </p>
-                <p><strong>Prioridad:</strong>
-                    <span th:classappend="${reporte.prioridad.name() == 'ALTA'  ? 'badge-alta'  :
-                                           reporte.prioridad.name() == 'MEDIA' ? 'badge-media' :
-                                                                                  'badge-baja'}"
-                          class="badge"
-                          th:text="${reporte.prioridad.name()}">prioridad</span>
-                </p>
-                <p><strong>Creado por:</strong>
-                    <span th:text="${reporte.creador.nombre}">usuario</span>
-                </p>
-                <p><strong>Fecha:</strong>
-                    <span th:text="${#temporals.format(reporte.fechaCreacion, 'dd/MM/yyyy HH:mm')}">fecha</span>
-                </p>
+            <!-- Sin reportes -->
+            <div th:if="${#lists.isEmpty(reportes)}" class="table-card">
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <p>No hay reportes registrados todavía.</p>
+                    <a th:href="@{/reportes/nuevo}" class="btn btn-primary">Crear el primero</a>
+                </div>
             </div>
 
-            <div class="card-footer">
-                <a th:href="@{/reportes/{id}(id=${reporte.id})}" class="btn btn-secondary btn-sm">Ver detalle</a>
+            <!-- Tabla de reportes -->
+            <div class="table-card" th:unless="${#lists.isEmpty(reportes)}">
+                <div class="table-toolbar">
+                    <h2>📋 Lista de reportes</h2>
+                    <span style="font-size:0.85rem; color:var(--gray);"
+                          th:text="${#lists.size(reportes)} + ' reporte(s) encontrado(s)'"></span>
+                </div>
+                <table class="tabla">
+                    <thead>
+                        <tr>
+                            <th>Ubicación</th>
+                            <th>Categoría</th>
+                            <th>Descripción</th>
+                            <th>Prioridad</th>
+                            <th>Estado</th>
+                            <th>Creado por</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="r : ${reportes}">
+                            <td>
+                                <strong th:text="${r.ubicacion.edificio}">edificio</strong><br/>
+                                <small style="color:var(--gray);" th:text="${r.ubicacion.espacio}">espacio</small>
+                            </td>
+                            <td>
+                                <span th:text="${r.categoria.name() == 'EQUIPOS_COMPUTO' ? '💻 Equipos' :
+                                                 r.categoria.name() == 'RED_INTERNET'   ? '🌐 Red' :
+                                                 r.categoria.name() == 'ELECTRICIDAD'   ? '⚡ Electricidad' :
+                                                 r.categoria.name() == 'MOBILIARIO'     ? '🪑 Mobiliario' : '🔧 Otro'}">
+                                </span>
+                            </td>
+                            <td th:text="${#strings.abbreviate(r.descripcion, 50)}">desc</td>
+                            <td>
+                                <span th:classappend="${r.prioridad.name() == 'ALTA'  ? 'badge-alta'  :
+                                                       r.prioridad.name() == 'MEDIA' ? 'badge-media' : 'badge-baja'}"
+                                      class="badge"
+                                      th:text="${r.prioridad.name()}">prioridad</span>
+                            </td>
+                            <td>
+                                <span th:with="est=${r.estado.class.simpleName}"
+                                      th:classappend="${est == 'EstadoPendiente'   ? 'badge-pendiente'   :
+                                                        est == 'EstadoEnRevision'  ? 'badge-revision'    :
+                                                        est == 'EstadoEnProceso'   ? 'badge-proceso'     :
+                                                        est == 'EstadoSolucionado' ? 'badge-solucionado' : 'badge-cerrado'}"
+                                      class="badge"
+                                      th:text="${est == 'EstadoPendiente'   ? 'Pendiente'   :
+                                                  est == 'EstadoEnRevision'  ? 'En Revisión' :
+                                                  est == 'EstadoEnProceso'   ? 'En Proceso'  :
+                                                  est == 'EstadoSolucionado' ? 'Solucionado' : 'Cerrado'}">
+                                </span>
+                            </td>
+                            <td th:text="${r.creador.nombre}">creador</td>
+                            <td th:text="${#temporals.format(r.fechaCreacion, 'dd/MM/yy HH:mm')}">fecha</td>
+                            <td>
+                                <a th:href="@{/reportes/{id}(id=${r.id})}" class="btn btn-dark btn-sm">Ver</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
         </div>
     </div>
-
 </div>
 </body>
 </html>

@@ -7,54 +7,89 @@
     <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
 </head>
 <body>
+<div class="layout">
 
-<nav class="navbar">
-    <a class="navbar-brand" th:href="@{/}">🔧 Reporte Daños</a>
-    <div class="navbar-links">
-        <a th:href="@{/reportes}">Reportes</a>
-        <a th:href="@{/reportes/nuevo}">Nuevo Reporte</a>
-        <a th:href="@{/usuarios}">Usuarios</a>
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <h2>🔧 Reporte Daños</h2>
+            <span>Sistema universitario</span>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">General</div>
+            <a th:href="@{/}"><span class="icon">📊</span> Dashboard</a>
+            <div class="nav-section">Gestión</div>
+            <a th:href="@{/reportes}"><span class="icon">📋</span> Todos los reportes</a>
+            <a th:href="@{/reportes/nuevo}"><span class="icon">➕</span> Nuevo reporte</a>
+            <div class="nav-section">Administración</div>
+            <a th:href="@{/usuarios}" class="active"><span class="icon">👥</span> Usuarios</a>
+            <a th:href="@{/usuarios/nuevo}"><span class="icon">👤</span> Nuevo usuario</a>
+        </nav>
+        <div class="sidebar-footer">Universidad · v1.0</div>
+    </aside>
+
+    <div class="main-wrapper">
+        <div class="topbar">
+            <span class="topbar-title">Usuarios del sistema</span>
+            <div class="topbar-actions">
+                <a th:href="@{/usuarios/nuevo}" class="btn btn-primary btn-sm">👤 Nuevo usuario</a>
+            </div>
+        </div>
+
+        <div class="main-content">
+
+            <div th:if="${mensaje}" class="alert alert-success">✅ <span th:text="${mensaje}"></span></div>
+
+            <div class="page-header">
+                <div class="page-header-left">
+                    <h1>👥 Usuarios</h1>
+                    <p>Gestiona los usuarios y sus roles en el sistema</p>
+                </div>
+                <div class="page-header-right">
+                    <a th:href="@{/usuarios/nuevo}" class="btn btn-primary">👤 Nuevo usuario</a>
+                </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(usuarios)}" class="table-card">
+                <div class="empty-state">
+                    <div class="empty-icon">👤</div>
+                    <p>No hay usuarios registrados.</p>
+                    <a th:href="@{/usuarios/nuevo}" class="btn btn-primary">Crear el primero</a>
+                </div>
+            </div>
+
+            <div class="table-card" th:unless="${#lists.isEmpty(usuarios)}">
+                <div class="table-toolbar">
+                    <h2>👥 Lista de usuarios</h2>
+                    <span style="font-size:0.85rem; color:var(--gray);"
+                          th:text="${#lists.size(usuarios)} + ' usuario(s)'"></span>
+                </div>
+                <table class="tabla">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="u : ${usuarios}">
+                            <td>
+                                <strong th:text="${u.nombre}">nombre</strong>
+                            </td>
+                            <td th:text="${u.email.valor}">email</td>
+                            <td th:text="${u.rol.name().replace('_',' ')}">rol</td>
+                            <td>
+                                <span th:if="${u.activo}"  class="badge badge-activo">✅ Activo</span>
+                                <span th:unless="${u.activo}" class="badge badge-inactivo">⛔ Inactivo</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
     </div>
-</nav>
-
-<div class="container">
-
-    <div class="page-header">
-        <h1>👥 Usuarios</h1>
-        <a th:href="@{/usuarios/nuevo}" class="btn btn-primary">+ Nuevo Usuario</a>
-    </div>
-
-    <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
-
-    <div th:if="${#lists.isEmpty(usuarios)}" class="empty-state">
-        <p>No hay usuarios registrados.</p>
-        <a th:href="@{/usuarios/nuevo}" class="btn btn-primary">Crear el primero</a>
-    </div>
-
-    <table class="tabla" th:unless="${#lists.isEmpty(usuarios)}">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Rol</th>
-                <th>Estado</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="u : ${usuarios}">
-                <td th:text="${u.nombre}">nombre</td>
-                <td th:text="${u.email.valor}">email</td>
-                <td th:text="${u.rol.name().replace('_', ' ')}">rol</td>
-                <td>
-                    <span th:if="${u.activo}"
-                          class="badge badge-solucionado">Activo</span>
-                    <span th:unless="${u.activo}"
-                          class="badge badge-cerrado">Inactivo</span>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
 </div>
 </body>
 </html>

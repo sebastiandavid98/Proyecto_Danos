@@ -3,98 +3,182 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Inicio | Reporte Daños</title>
+    <title>Dashboard | Reporte Daños</title>
     <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
-    <style>
-        .hero {
-            text-align: center;
-            padding: 4rem 2rem 3rem;
-        }
-        .hero h1 {
-            font-size: 2.2rem;
-            color: #1a1a2e;
-            margin-bottom: 0.8rem;
-        }
-        .hero p {
-            color: #666;
-            font-size: 1.05rem;
-            max-width: 520px;
-            margin: 0 auto 2rem;
-            line-height: 1.6;
-        }
-        .hero-btns {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
-            margin-top: 2.5rem;
-        }
-        .stat-card {
-            background: white;
-            border-radius: 10px;
-            padding: 1.5rem;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.07);
-        }
-        .stat-numero {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #e94560;
-        }
-        .stat-label {
-            font-size: 0.85rem;
-            color: #888;
-            margin-top: 0.3rem;
-        }
-    </style>
 </head>
 <body>
+<div class="layout">
 
-<nav class="navbar">
-    <a class="navbar-brand" th:href="@{/}">🔧 Reporte Daños</a>
-    <div class="navbar-links">
-        <a th:href="@{/reportes}">Reportes</a>
-        <a th:href="@{/reportes/nuevo}">Nuevo Reporte</a>
-        <a th:href="@{/usuarios}">Usuarios</a>
-    </div>
-</nav>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <h2>🔧 Reporte Daños</h2>
+            <span>Sistema universitario</span>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">General</div>
+            <a th:href="@{/}" class="active">
+                <span class="icon">📊</span> Dashboard
+            </a>
+            <div class="nav-section">Gestión</div>
+            <a th:href="@{/reportes}">
+                <span class="icon">📋</span> Todos los reportes
+            </a>
+            <a th:href="@{/reportes/nuevo}">
+                <span class="icon">➕</span> Nuevo reporte
+            </a>
+            <div class="nav-section">Administración</div>
+            <a th:href="@{/usuarios}">
+                <span class="icon">👥</span> Usuarios
+            </a>
+            <a th:href="@{/usuarios/nuevo}">
+                <span class="icon">👤</span> Nuevo usuario
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            Universidad · v1.0
+        </div>
+    </aside>
 
-<div class="container">
+    <!-- CONTENIDO -->
+    <div class="main-wrapper">
+        <div class="topbar">
+            <span class="topbar-title">Dashboard</span>
+            <div class="topbar-actions">
+                <a th:href="@{/reportes/nuevo}" class="btn btn-primary btn-sm">➕ Nuevo reporte</a>
+                <a th:href="@{/usuarios/nuevo}" class="btn btn-outline btn-sm">👤 Nuevo usuario</a>
+            </div>
+        </div>
 
-    <div class="hero">
-        <h1>🏫 Sistema de Reportes de Daños</h1>
-        <p>Registra, da seguimiento y cierra los reportes de daños en las instalaciones de la universidad.</p>
-        <div class="hero-btns">
-            <a th:href="@{/reportes/nuevo}" class="btn btn-primary">+ Crear Reporte</a>
-            <a th:href="@{/reportes}" class="btn btn-secondary">Ver Reportes</a>
+        <div class="main-content">
+
+            <!-- Stats row -->
+            <div class="stats-row">
+                <div class="stat-card total">
+                    <div class="stat-icon">📁</div>
+                    <div class="stat-info">
+                        <div class="stat-numero" th:text="${total}">0</div>
+                        <div class="stat-label">Total reportes</div>
+                    </div>
+                </div>
+                <div class="stat-card pendiente">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-info">
+                        <div class="stat-numero" th:text="${pendientes}">0</div>
+                        <div class="stat-label">Pendientes</div>
+                    </div>
+                </div>
+                <div class="stat-card revision">
+                    <div class="stat-icon">🔍</div>
+                    <div class="stat-info">
+                        <div class="stat-numero" th:text="${enRevision}">0</div>
+                        <div class="stat-label">En revisión</div>
+                    </div>
+                </div>
+                <div class="stat-card proceso">
+                    <div class="stat-icon">⚙️</div>
+                    <div class="stat-info">
+                        <div class="stat-numero" th:text="${enProceso}">0</div>
+                        <div class="stat-label">En proceso</div>
+                    </div>
+                </div>
+                <div class="stat-card solucionado">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-info">
+                        <div class="stat-numero" th:text="${solucionados}">0</div>
+                        <div class="stat-label">Solucionados</div>
+                    </div>
+                </div>
+                <div class="stat-card cerrado">
+                    <div class="stat-icon">🔒</div>
+                    <div class="stat-info">
+                        <div class="stat-numero" th:text="${cerrados}">0</div>
+                        <div class="stat-label">Cerrados</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard grid -->
+            <div class="dashboard-grid">
+
+                <!-- Reportes recientes -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>📋 Reportes recientes</h3>
+                        <a th:href="@{/reportes}" class="btn btn-outline btn-sm">Ver todos</a>
+                    </div>
+                    <div class="panel-body">
+                        <div th:if="${#lists.isEmpty(recientes)}" class="empty-state" style="padding:2rem;">
+                            <p>No hay reportes aún.</p>
+                        </div>
+                        <a th:each="r : ${recientes}"
+                           th:href="@{/reportes/{id}(id=${r.id})}"
+                           class="reporte-item">
+                            <div class="reporte-item-icon">
+                                <span th:text="${r.categoria.name() == 'EQUIPOS_COMPUTO' ? '💻' :
+                                                 r.categoria.name() == 'RED_INTERNET'   ? '🌐' :
+                                                 r.categoria.name() == 'ELECTRICIDAD'   ? '⚡' :
+                                                 r.categoria.name() == 'MOBILIARIO'     ? '🪑' : '🔧'}">🔧</span>
+                            </div>
+                            <div class="reporte-item-info">
+                                <strong th:text="${r.ubicacion.descripcion()}">ubicacion</strong>
+                                <span th:text="${#strings.abbreviate(r.descripcion, 55)}">desc</span>
+                            </div>
+                            <span th:with="est=${r.estado.class.simpleName}"
+                                  th:classappend="${est == 'EstadoPendiente'   ? 'badge-pendiente'   :
+                                                    est == 'EstadoEnRevision'  ? 'badge-revision'    :
+                                                    est == 'EstadoEnProceso'   ? 'badge-proceso'     :
+                                                    est == 'EstadoSolucionado' ? 'badge-solucionado' :
+                                                                                  'badge-cerrado'}"
+                                  class="badge"
+                                  th:text="${est == 'EstadoPendiente'   ? 'Pendiente'   :
+                                              est == 'EstadoEnRevision'  ? 'Revisión'    :
+                                              est == 'EstadoEnProceso'   ? 'Proceso'     :
+                                              est == 'EstadoSolucionado' ? 'Solucionado' : 'Cerrado'}">
+                                estado
+                            </span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Panel lateral: por categoria -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>📊 Por categoría</h3>
+                    </div>
+                    <div class="panel-body" style="padding: 0.5rem 0;">
+                        <div class="cat-bar-item" th:each="entry : ${porCategoria}">
+                            <div class="cat-bar-label">
+                                <span th:text="${entry.key.replace('_',' ')}">cat</span>
+                                <span th:text="${entry.value}">0</span>
+                            </div>
+                            <div class="cat-bar-track">
+                                <div class="cat-bar-fill"
+                                     th:style="'width:' + (${total} > 0 ? (${entry.value} * 100 / ${total}) : 0) + '%'">
+                                </div>
+                            </div>
+                        </div>
+                        <div th:if="${#maps.isEmpty(porCategoria)}"
+                             style="padding:1rem 1.5rem; color:#94a3b8; font-size:0.85rem;">
+                            Sin datos aún.
+                        </div>
+                    </div>
+
+                    <!-- Acciones rapidas -->
+                    <div style="padding:1.2rem 1.5rem; border-top:1px solid var(--border); background:#f8fafc;">
+                        <p style="font-size:0.78rem; color:var(--gray); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.8rem;">Acciones rápidas</p>
+                        <div style="display:flex; flex-direction:column; gap:0.6rem;">
+                            <a th:href="@{/reportes/nuevo}" class="btn btn-primary btn-sm">➕ Crear reporte</a>
+                            <a th:href="@{/reportes}" class="btn btn-outline btn-sm">📋 Ver reportes</a>
+                            <a th:href="@{/usuarios/nuevo}" class="btn btn-outline btn-sm">👤 Crear usuario</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
     </div>
-
-    <!-- Estadisticas rapidas -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-numero" th:text="${total}">0</div>
-            <div class="stat-label">Total reportes</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-numero" th:text="${pendientes}">0</div>
-            <div class="stat-label">Pendientes</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-numero" th:text="${enProceso}">0</div>
-            <div class="stat-label">En proceso</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-numero" th:text="${cerrados}">0</div>
-            <div class="stat-label">Cerrados</div>
-        </div>
-    </div>
-
 </div>
 </body>
 </html>
