@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Nuevo Reporte | Reporte Daños</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+</head>
+<body>
+<div class="layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <h2>🔧 Reporte Daños</h2>
+            <span>Sistema universitario</span>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">General</div>
+            <a th:href="@{/}"><span class="icon">📊</span> Dashboard</a>
+            <div class="nav-section">Gestión</div>
+            <a th:href="@{/reportes}"><span class="icon">📋</span> Todos los reportes</a>
+            <a th:href="@{/reportes/nuevo}" class="active"><span class="icon">➕</span> Nuevo reporte</a>
+            <div class="nav-section">Administración</div>
+            <a th:href="@{/usuarios}"><span class="icon">👥</span> Usuarios</a>
+            <a th:href="@{/usuarios/nuevo}"><span class="icon">👤</span> Nuevo usuario</a>
+        </nav>
+        <div class="sidebar-footer">Universidad · v1.0</div>
+    </aside>
+
+    <div class="main-wrapper">
+        <div class="topbar">
+            <span class="topbar-title">Nuevo reporte</span>
+            <div class="topbar-actions">
+                <a th:href="@{/reportes}" class="btn btn-outline btn-sm">← Volver a reportes</a>
+            </div>
+        </div>
+
+        <div class="main-content">
+
+            <div class="page-header">
+                <div class="page-header-left">
+                    <h1>➕ Registrar nuevo daño</h1>
+                    <p>Completa el formulario con la información del daño encontrado</p>
+                </div>
+            </div>
+
+            <div class="form-wrapper">
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <h2>📝 Información del daño</h2>
+                        <p>Todos los campos marcados son obligatorios</p>
+                    </div>
+
+                    <div th:if="${error}" class="alert alert-error" style="margin:1rem 2rem 0;">
+                        ❌ <span th:text="${error}"></span>
+                    </div>
+
+                    <form th:action="@{/reportes}" method="post">
+                        <div class="form-card-body">
+
+                            <div class="form-group">
+                                <label for="creadorId">👤 Reportado por</label>
+                                <select id="creadorId" name="creadorId" required>
+                                    <option value="">-- Selecciona un usuario --</option>
+                                    <option th:each="u : ${usuarios}"
+                                            th:value="${u.id}"
+                                            th:text="${u.nombre + ' · ' + u.rol.name().replace('_',' ')}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="categoria">🗂️ Categoría</label>
+                                    <select id="categoria" name="categoria" required>
+                                        <option value="">-- Selecciona --</option>
+                                        <option th:each="cat : ${categorias}"
+                                                th:value="${cat.name()}"
+                                                th:text="${cat.name().replace('_',' ')}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="prioridad">🚨 Prioridad</label>
+                                    <select id="prioridad" name="prioridad" required>
+                                        <option value="">-- Selecciona --</option>
+                                        <option th:each="p : ${prioridades}"
+                                                th:value="${p.name()}"
+                                                th:text="${p.name()}">
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="edificio">🏛️ Edificio</label>
+                                    <input type="text" id="edificio" name="edificio"
+                                           placeholder="Ej: Bloque A" required/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="espacio">📍 Espacio</label>
+                                    <input type="text" id="espacio" name="espacio"
+                                           placeholder="Ej: Laboratorio 3, Puesto 5" required/>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="descripcion">📝 Descripción del daño</label>
+                                <textarea id="descripcion" name="descripcion"
+                                          placeholder="Describe con detalle qué está dañado, cómo ocurrió o cómo afecta las actividades..."
+                                          required></textarea>
+                            </div>
+
+                        </div>
+                        <div class="form-footer">
+                            <button type="submit" class="btn btn-primary">✅ Crear reporte</button>
+                            <a th:href="@{/reportes}" class="btn btn-outline">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

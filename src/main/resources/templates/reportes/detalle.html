@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Detalle Reporte | Reporte Daños</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+</head>
+<body>
+<div class="layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <h2>🔧 Reporte Daños</h2>
+            <span>Sistema universitario</span>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">General</div>
+            <a th:href="@{/}"><span class="icon">📊</span> Dashboard</a>
+            <div class="nav-section">Gestión</div>
+            <a th:href="@{/reportes}" class="active"><span class="icon">📋</span> Todos los reportes</a>
+            <a th:href="@{/reportes/nuevo}"><span class="icon">➕</span> Nuevo reporte</a>
+            <div class="nav-section">Administración</div>
+            <a th:href="@{/usuarios}"><span class="icon">👥</span> Usuarios</a>
+            <a th:href="@{/usuarios/nuevo}"><span class="icon">👤</span> Nuevo usuario</a>
+        </nav>
+        <div class="sidebar-footer">Universidad · v1.0</div>
+    </aside>
+
+    <div class="main-wrapper">
+        <div class="topbar">
+            <span class="topbar-title">Detalle del reporte</span>
+            <div class="topbar-actions">
+                <a th:href="@{/reportes}" class="btn btn-outline btn-sm">← Volver a reportes</a>
+                <a th:href="@{/reportes/nuevo}" class="btn btn-primary btn-sm">➕ Nuevo reporte</a>
+            </div>
+        </div>
+
+        <div class="main-content">
+
+            <div th:if="${mensaje}" class="alert alert-success">✅ <span th:text="${mensaje}"></span></div>
+            <div th:if="${error}"   class="alert alert-error">❌ <span th:text="${error}"></span></div>
+
+            <div class="detalle-wrapper">
+
+                <!-- Tarjeta principal -->
+                <div class="detalle-card">
+
+                    <!-- Hero -->
+                    <div class="detalle-hero">
+                        <h2 th:text="${reporte.ubicacion.descripcion()}">Ubicacion</h2>
+                        <div class="detalle-hero-meta">
+                            <span th:with="est=${reporte.estado.class.simpleName}"
+                                  th:classappend="${est == 'EstadoPendiente'   ? 'badge-pendiente'   :
+                                                    est == 'EstadoEnRevision'  ? 'badge-revision'    :
+                                                    est == 'EstadoEnProceso'   ? 'badge-proceso'     :
+                                                    est == 'EstadoSolucionado' ? 'badge-solucionado' : 'badge-cerrado'}"
+                                  class="badge"
+                                  th:text="${est == 'EstadoPendiente'   ? '⏳ Pendiente'   :
+                                              est == 'EstadoEnRevision'  ? '🔍 En Revisión' :
+                                              est == 'EstadoEnProceso'   ? '⚙️ En Proceso'  :
+                                              est == 'EstadoSolucionado' ? '✅ Solucionado' : '🔒 Cerrado'}">
+                            </span>
+                            <span th:classappend="${reporte.prioridad.name() == 'ALTA'  ? 'badge-alta'  :
+                                                   reporte.prioridad.name() == 'MEDIA' ? 'badge-media' : 'badge-baja'}"
+                                  class="badge"
+                                  th:text="${'🚨 ' + reporte.prioridad.name()}">
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Timeline -->
+                    <div class="timeline">
+                        <h4>Progreso del reporte</h4>
+                        <div class="timeline-steps" th:with="est=${reporte.estado.class.simpleName}">
+
+                            <div th:classappend="${est == 'EstadoPendiente' ? 'current' :
+                                                   (est != 'EstadoPendiente' ? 'done' : '')}"
+                                 class="timeline-step">
+                                <div class="step-circle">1</div>
+                                <div class="step-label">Pendiente</div>
+                            </div>
+
+                            <div th:classappend="${est == 'EstadoEnRevision' ? 'current' :
+                                                   (est == 'EstadoEnProceso' or est == 'EstadoSolucionado' or est == 'EstadoCerrado' ? 'done' : '')}"
+                                 class="timeline-step">
+                                <div class="step-circle">2</div>
+                                <div class="step-label">En Revisión</div>
+                            </div>
+
+                            <div th:classappend="${est == 'EstadoEnProceso' ? 'current' :
+                                                   (est == 'EstadoSolucionado' or est == 'EstadoCerrado' ? 'done' : '')}"
+                                 class="timeline-step">
+                                <div class="step-circle">3</div>
+                                <div class="step-label">En Proceso</div>
+                            </div>
+
+                            <div th:classappend="${est == 'EstadoSolucionado' ? 'current' :
+                                                   (est == 'EstadoCerrado' ? 'done' : '')}"
+                                 class="timeline-step">
+                                <div class="step-circle">4</div>
+                                <div class="step-label">Solucionado</div>
+                            </div>
+
+                            <div th:classappend="${est == 'EstadoCerrado' ? 'done' : ''}"
+                                 class="timeline-step">
+                                <div class="step-circle">5</div>
+                                <div class="step-label">Cerrado</div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Detalles -->
+                    <div class="detalle-seccion">
+                        <h4>Información del daño</h4>
+                        <div class="detalle-grid">
+                            <div class="detalle-campo">
+                                <div class="campo-label">Categoría</div>
+                                <div class="campo-valor"
+                                     th:text="${reporte.categoria.name().replace('_',' ')}"></div>
+                            </div>
+                            <div class="detalle-campo">
+                                <div class="campo-label">Ubicación</div>
+                                <div class="campo-valor"
+                                     th:text="${reporte.ubicacion.descripcion()}"></div>
+                            </div>
+                            <div class="detalle-campo">
+                                <div class="campo-label">Creado por</div>
+                                <div class="campo-valor"
+                                     th:text="${reporte.creador.nombre}"></div>
+                            </div>
+                            <div class="detalle-campo">
+                                <div class="campo-label">Responsable</div>
+                                <div class="campo-valor"
+                                     th:text="${reporte.responsable != null ? reporte.responsable.nombre : 'Sin asignar'}"></div>
+                            </div>
+                            <div class="detalle-campo">
+                                <div class="campo-label">Fecha de creación</div>
+                                <div class="campo-valor"
+                                     th:text="${#temporals.format(reporte.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detalle-seccion">
+                        <h4>Descripción</h4>
+                        <p style="font-size:0.95rem; color:var(--dark3); line-height:1.7;"
+                           th:text="${reporte.descripcion}"></p>
+                    </div>
+
+                    <div class="detalle-seccion" th:if="${reporte.solucion != null}">
+                        <h4>Solución registrada</h4>
+                        <p style="font-size:0.95rem; color:var(--dark3); line-height:1.7; background:#d1fae5; padding:1rem; border-radius:8px;"
+                           th:text="${reporte.solucion}"></p>
+                    </div>
+
+                </div>
+
+                <!-- Panel de acciones -->
+                <div class="acciones-card" th:with="est=${reporte.estado.class.simpleName}">
+                    <div class="acciones-header">
+                        <h3>⚡ Acciones disponibles</h3>
+                    </div>
+                    <div class="acciones-body">
+
+                        <!-- Pendiente -->
+                        <form th:if="${est == 'EstadoPendiente'}"
+                              th:action="@{/reportes/{id}/revision(id=${reporte.id})}" method="post">
+                            <button type="submit" class="btn btn-accent">🔍 Iniciar Revisión</button>
+                        </form>
+
+                        <!-- En Revision -->
+                        <th:block th:if="${est == 'EstadoEnRevision'}">
+                            <form th:action="@{/reportes/{id}/responsable(id=${reporte.id})}"
+                                  method="post" class="accion-form">
+                                <select name="responsableId" required>
+                                    <option value="">-- Asignar responsable --</option>
+                                    <option th:each="u : ${usuarios}"
+                                            th:value="${u.id}"
+                                            th:text="${u.nombre + ' · ' + u.rol.name().replace('_',' ')}">
+                                    </option>
+                                </select>
+                                <button type="submit" class="btn btn-warning">👤 Asignar</button>
+                            </form>
+                            <form th:if="${reporte.responsable != null}"
+                                  th:action="@{/reportes/{id}/proceso(id=${reporte.id})}" method="post">
+                                <button type="submit" class="btn btn-primary">⚙️ Iniciar Proceso</button>
+                            </form>
+                        </th:block>
+
+                        <!-- En Proceso -->
+                        <form th:if="${est == 'EstadoEnProceso'}"
+                              th:action="@{/reportes/{id}/solucion(id=${reporte.id})}"
+                              method="post" class="accion-form">
+                            <input type="text" name="descripcionSolucion"
+                                   placeholder="Describe qué se hizo para resolver el daño..." required/>
+                            <button type="submit" class="btn btn-success">✅ Registrar Solución</button>
+                        </form>
+
+                        <!-- Solucionado -->
+                        <form th:if="${est == 'EstadoSolucionado'}"
+                              th:action="@{/reportes/{id}/cerrar(id=${reporte.id})}" method="post">
+                            <button type="submit" class="btn btn-danger">🔒 Cerrar Reporte</button>
+                        </form>
+
+                        <!-- Cerrado -->
+                        <div th:if="${est == 'EstadoCerrado'}"
+                             style="color:var(--gray); font-size:0.9rem; padding:0.5rem;">
+                            🔒 Este reporte está cerrado y archivado. No se pueden realizar más acciones.
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

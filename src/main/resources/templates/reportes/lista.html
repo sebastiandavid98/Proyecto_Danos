@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Reportes | Reporte Daños</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+</head>
+<body>
+<div class="layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <h2>🔧 Reporte Daños</h2>
+            <span>Sistema universitario</span>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">General</div>
+            <a th:href="@{/}"><span class="icon">📊</span> Dashboard</a>
+            <div class="nav-section">Gestión</div>
+            <a th:href="@{/reportes}" class="active"><span class="icon">📋</span> Todos los reportes</a>
+            <a th:href="@{/reportes/nuevo}"><span class="icon">➕</span> Nuevo reporte</a>
+            <div class="nav-section">Administración</div>
+            <a th:href="@{/usuarios}"><span class="icon">👥</span> Usuarios</a>
+            <a th:href="@{/usuarios/nuevo}"><span class="icon">👤</span> Nuevo usuario</a>
+        </nav>
+        <div class="sidebar-footer">Universidad · v1.0</div>
+    </aside>
+
+    <div class="main-wrapper">
+        <div class="topbar">
+            <span class="topbar-title">Reportes de daños</span>
+            <div class="topbar-actions">
+                <a th:href="@{/reportes/nuevo}" class="btn btn-primary btn-sm">➕ Nuevo reporte</a>
+            </div>
+        </div>
+
+        <div class="main-content">
+
+            <div th:if="${mensaje}" class="alert alert-success">✅ <span th:text="${mensaje}"></span></div>
+            <div th:if="${error}"   class="alert alert-error">❌ <span th:text="${error}"></span></div>
+
+            <div class="page-header">
+                <div class="page-header-left">
+                    <h1>📋 Todos los reportes</h1>
+                    <p>Gestiona y da seguimiento a cada reporte registrado</p>
+                </div>
+                <div class="page-header-right">
+                    <a th:href="@{/reportes/nuevo}" class="btn btn-primary">➕ Nuevo reporte</a>
+                </div>
+            </div>
+
+            <!-- Sin reportes -->
+            <div th:if="${#lists.isEmpty(reportes)}" class="table-card">
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <p>No hay reportes registrados todavía.</p>
+                    <a th:href="@{/reportes/nuevo}" class="btn btn-primary">Crear el primero</a>
+                </div>
+            </div>
+
+            <!-- Tabla de reportes -->
+            <div class="table-card" th:unless="${#lists.isEmpty(reportes)}">
+                <div class="table-toolbar">
+                    <h2>📋 Lista de reportes</h2>
+                    <span style="font-size:0.85rem; color:var(--gray);"
+                          th:text="${#lists.size(reportes)} + ' reporte(s) encontrado(s)'"></span>
+                </div>
+                <table class="tabla">
+                    <thead>
+                        <tr>
+                            <th>Ubicación</th>
+                            <th>Categoría</th>
+                            <th>Descripción</th>
+                            <th>Prioridad</th>
+                            <th>Estado</th>
+                            <th>Creado por</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="r : ${reportes}">
+                            <td>
+                                <strong th:text="${r.ubicacion.edificio}">edificio</strong><br/>
+                                <small style="color:var(--gray);" th:text="${r.ubicacion.espacio}">espacio</small>
+                            </td>
+                            <td>
+                                <span th:text="${r.categoria.name() == 'EQUIPOS_COMPUTO' ? '💻 Equipos' :
+                                                 r.categoria.name() == 'RED_INTERNET'   ? '🌐 Red' :
+                                                 r.categoria.name() == 'ELECTRICIDAD'   ? '⚡ Electricidad' :
+                                                 r.categoria.name() == 'MOBILIARIO'     ? '🪑 Mobiliario' : '🔧 Otro'}">
+                                </span>
+                            </td>
+                            <td th:text="${#strings.abbreviate(r.descripcion, 50)}">desc</td>
+                            <td>
+                                <span th:classappend="${r.prioridad.name() == 'ALTA'  ? 'badge-alta'  :
+                                                       r.prioridad.name() == 'MEDIA' ? 'badge-media' : 'badge-baja'}"
+                                      class="badge"
+                                      th:text="${r.prioridad.name()}">prioridad</span>
+                            </td>
+                            <td>
+                                <span th:with="est=${r.estado.class.simpleName}"
+                                      th:classappend="${est == 'EstadoPendiente'   ? 'badge-pendiente'   :
+                                                        est == 'EstadoEnRevision'  ? 'badge-revision'    :
+                                                        est == 'EstadoEnProceso'   ? 'badge-proceso'     :
+                                                        est == 'EstadoSolucionado' ? 'badge-solucionado' : 'badge-cerrado'}"
+                                      class="badge"
+                                      th:text="${est == 'EstadoPendiente'   ? 'Pendiente'   :
+                                                  est == 'EstadoEnRevision'  ? 'En Revisión' :
+                                                  est == 'EstadoEnProceso'   ? 'En Proceso'  :
+                                                  est == 'EstadoSolucionado' ? 'Solucionado' : 'Cerrado'}">
+                                </span>
+                            </td>
+                            <td th:text="${r.creador.nombre}">creador</td>
+                            <td th:text="${#temporals.format(r.fechaCreacion, 'dd/MM/yy HH:mm')}">fecha</td>
+                            <td>
+                                <a th:href="@{/reportes/{id}(id=${r.id})}" class="btn btn-dark btn-sm">Ver</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

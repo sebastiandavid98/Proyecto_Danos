@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte Daños | Dashboard</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            position: fixed;
+            left: 0; top: 0;
+            background: linear-gradient(180deg, #111827, #172554);
+            color: white;
+            padding: 25px 18px;
+            box-shadow: 5px 0 20px rgba(0,0,0,.08);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        .logo-icon {
+            width: 45px; height: 45px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            background: #2563eb;
+            font-size: 23px;
+        }
+
+        .logo h4 { margin: 0; font-weight: 700; }
+        .logo small { color: #94a3b8; }
+
+        .menu-title {
+            color: #64748b;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin: 20px 10px 10px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin-bottom: 5px;
+            transition: .25s;
+        }
+
+        .sidebar a:hover, .sidebar a.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .sidebar a i { font-size: 18px; }
+
+        /* MAIN */
+        .main { margin-left: 260px; min-height: 100vh; }
+
+        /* TOPBAR */
+        .topbar {
+            height: 75px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 35px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .search { width: 350px; position: relative; }
+        .search input {
+            width: 100%;
+            border: none;
+            background: #f1f5f9;
+            padding: 11px 15px 11px 40px;
+            border-radius: 10px;
+            outline: none;
+        }
+        .search i { position: absolute; left: 14px; top: 11px; color: #64748b; }
+
+        .top-actions { display: flex; align-items: center; gap: 20px; }
+
+        .notification {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+        }
+
+        .notification span {
+            position: absolute;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+            top: 8px; right: 8px;
+        }
+
+        .profile { display: flex; align-items: center; gap: 10px; }
+        .profile img { width: 40px; height: 40px; border-radius: 50%; }
+
+        /* CONTENT */
+        .content { padding: 35px; }
+
+        .welcome {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .welcome h2 { font-weight: 700; margin-bottom: 5px; }
+        .welcome p { color: #64748b; margin: 0; }
+
+        .btn-report {
+            background: #2563eb;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            transition: .25s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-report:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        /* STAT CARDS */
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 22px;
+            border: 1px solid #e5e7eb;
+            transition: .25s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,.08);
+        }
+
+        .stat-top { display: flex; justify-content: space-between; align-items: center; }
+
+        .stat-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 21px;
+        }
+
+        .blue   { background: #dbeafe; color: #2563eb; }
+        .yellow { background: #fef3c7; color: #d97706; }
+        .purple { background: #ede9fe; color: #7c3aed; }
+        .green  { background: #dcfce7; color: #16a34a; }
+
+        .stat-number { font-size: 30px; font-weight: 700; margin-top: 15px; }
+        .stat-label  { color: #64748b; font-size: 14px; }
+        .stat-change { font-size: 12px; color: #16a34a; margin-top: 7px; }
+
+        /* PANELS */
+        .panel {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+            padding: 24px;
+            height: 100%;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .panel-header h5 { font-weight: 700; margin: 0; }
+        .view-all { color: #2563eb; font-size: 14px; text-decoration: none; }
+
+        /* REPORTES */
+        .report {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #edf0f3;
+            text-decoration: none;
+            color: inherit;
+            transition: background .2s;
+        }
+
+        .report:last-child { border-bottom: none; }
+        .report:hover { background: #f8fafc; border-radius: 8px; padding-left: 8px; }
+
+        .report-info { display: flex; gap: 14px; align-items: center; }
+
+        .report-icon {
+            width: 42px; height: 42px;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .report h6 { margin: 0; font-weight: 600; }
+        .report small { color: #94a3b8; }
+
+        .badge-status {
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .pending   { background: #fef3c7; color: #b45309; }
+        .process   { background: #dbeafe; color: #1d4ed8; }
+        .review    { background: #cffafe; color: #164e63; }
+        .solved    { background: #dcfce7; color: #15803d; }
+        .closed    { background: #f1f5f9; color: #475569; }
+
+        /* CATEGORIAS */
+        .category { margin-bottom: 20px; }
+
+        .category-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 7px;
+        }
+
+        .category-info span { font-size: 13px; }
+        .progress { height: 8px; background: #e5e7eb; border-radius: 20px; }
+        .progress-bar { border-radius: 20px; }
+
+        /* ACCIONES RAPIDAS */
+        .quick-action {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #1f2937;
+            margin-bottom: 10px;
+            transition: .25s;
+        }
+
+        .quick-action:hover {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            transform: translateX(4px);
+            color: #1f2937;
+        }
+
+        .quick-icon {
+            width: 42px; height: 42px;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 992px) {
+            .sidebar { width: 80px; }
+            .sidebar span, .logo-text, .menu-title { display: none; }
+            .main { margin-left: 80px; }
+            .sidebar a { justify-content: center; }
+            .search { width: 220px; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; }
+            .topbar { padding: 0 15px; }
+            .search { display: none; }
+            .content { padding: 20px; }
+            .welcome { flex-direction: column; align-items: flex-start; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="logo">
+        <div class="logo-icon"><i class="bi bi-tools"></i></div>
+        <div class="logo-text">
+            <h4>Reporte Daños</h4>
+            <small>Sistema Universitario</small>
+        </div>
+    </div>
+
+    <div class="menu-title">PRINCIPAL</div>
+    <a th:href="@{/}" class="active">
+        <i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span>
+    </a>
+
+    <div class="menu-title">GESTIÓN</div>
+    <a th:href="@{/reportes}">
+        <i class="bi bi-file-earmark-text"></i><span>Reportes</span>
+    </a>
+    <a th:href="@{/reportes/nuevo}">
+        <i class="bi bi-plus-circle"></i><span>Nuevo reporte</span>
+    </a>
+
+    <div class="menu-title">ADMINISTRACIÓN</div>
+    <a th:href="@{/usuarios}">
+        <i class="bi bi-people"></i><span>Usuarios</span>
+    </a>
+    <a th:href="@{/usuarios/nuevo}">
+        <i class="bi bi-person-plus"></i><span>Nuevo usuario</span>
+    </a>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+        <div class="search">
+            <i class="bi bi-search"></i>
+            <input type="text" placeholder="Buscar reportes...">
+        </div>
+        <div class="top-actions">
+            <div class="notification">
+                <i class="bi bi-bell"></i>
+                <span th:if="${pendientes > 0}"></span>
+            </div>
+            <div class="profile">
+                <img src="https://i.pravatar.cc/100?img=12" alt="Usuario">
+                <div>
+                    <strong>Administrador</strong>
+                    <small class="d-block text-muted">Sistema</small>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO -->
+    <section class="content">
+
+        <!-- BIENVENIDA -->
+        <div class="welcome">
+            <div>
+                <h2>¡Bienvenido de nuevo! 👋</h2>
+                <p>Aquí tienes un resumen de lo que está sucediendo con los reportes.</p>
+            </div>
+            <a th:href="@{/reportes/nuevo}" class="btn-report">
+                <i class="bi bi-plus-lg"></i> Nuevo reporte
+            </a>
+        </div>
+
+        <!-- ESTADISTICAS -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div>
+                            <div class="stat-label">Total reportes</div>
+                            <div class="stat-number" th:text="${total}">0</div>
+                            <div class="stat-change">registrados en el sistema</div>
+                        </div>
+                        <div class="stat-icon blue">
+                            <i class="bi bi-file-earmark-text"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div>
+                            <div class="stat-label">Pendientes</div>
+                            <div class="stat-number" th:text="${pendientes}">0</div>
+                            <div class="stat-change">esperando revisión</div>
+                        </div>
+                        <div class="stat-icon yellow">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div>
+                            <div class="stat-label">En proceso</div>
+                            <div class="stat-number" th:text="${enProceso}">0</div>
+                            <div class="stat-change">siendo atendidos</div>
+                        </div>
+                        <div class="stat-icon purple">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div>
+                            <div class="stat-label">Solucionados</div>
+                            <div class="stat-number" th:text="${solucionados}">0</div>
+                            <div class="stat-change">completados</div>
+                        </div>
+                        <div class="stat-icon green">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REPORTES + CATEGORIAS -->
+        <div class="row g-4 mb-4">
+
+            <!-- REPORTES RECIENTES -->
+            <div class="col-lg-8">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h5><i class="bi bi-clock-history me-2"></i>Reportes recientes</h5>
+                        <a th:href="@{/reportes}" class="view-all">Ver todos</a>
+                    </div>
+
+                    <!-- Sin reportes -->
+                    <div th:if="${#lists.isEmpty(recientes)}"
+                         style="text-align:center; padding:2rem; color:#94a3b8;">
+                        <i class="bi bi-inbox" style="font-size:2rem;"></i>
+                        <p style="margin-top:0.5rem;">No hay reportes aún.</p>
+                    </div>
+
+                    <!-- Lista de reportes -->
+                    <a th:each="r : ${recientes}"
+                       th:href="@{/reportes/{id}(id=${r.id})}"
+                       class="report">
+                        <div class="report-info">
+                            <div class="report-icon">
+                                <i th:classappend="${r.categoria.name() == 'EQUIPOS_COMPUTO' ? 'bi-pc-display'    :
+                                                    r.categoria.name() == 'RED_INTERNET'    ? 'bi-wifi'          :
+                                                    r.categoria.name() == 'ELECTRICIDAD'    ? 'bi-lightning'     :
+                                                    r.categoria.name() == 'MOBILIARIO'      ? 'bi-chair'         :
+                                                                                               'bi-tools'}"
+                                   class="bi"></i>
+                            </div>
+                            <div>
+                                <h6 th:text="${r.ubicacion.descripcion()}">ubicacion</h6>
+                                <small th:text="${#strings.abbreviate(r.descripcion, 50)}">desc</small>
+                            </div>
+                        </div>
+                        <span th:with="est=${r.estado.class.simpleName}"
+                              th:classappend="${est == 'EstadoPendiente'   ? 'pending' :
+                                               est == 'EstadoEnRevision'  ? 'review'  :
+                                               est == 'EstadoEnProceso'   ? 'process' :
+                                               est == 'EstadoSolucionado' ? 'solved'  : 'closed'}"
+                              class="badge-status"
+                              th:text="${est == 'EstadoPendiente'   ? 'Pendiente'   :
+                                         est == 'EstadoEnRevision'  ? 'En Revisión' :
+                                         est == 'EstadoEnProceso'   ? 'En proceso'  :
+                                         est == 'EstadoSolucionado' ? 'Solucionado' : 'Cerrado'}">
+                        </span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- CATEGORIAS -->
+            <div class="col-lg-4">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h5>Por categoría</h5>
+                        <i class="bi bi-bar-chart"></i>
+                    </div>
+
+                    <div th:if="${#maps.isEmpty(porCategoria)}"
+                         style="color:#94a3b8; font-size:0.85rem;">
+                        Sin datos aún.
+                    </div>
+
+                    <div class="category" th:each="entry : ${porCategoria}">
+                        <div class="category-info">
+                            <span th:text="${entry.key}">cat</span>
+                            <strong th:text="${total > 0 ? #numbers.formatDecimal(entry.value * 100.0 / total, 0, 0) + '%' : '0%'}">0%</strong>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-primary"
+                                 th:style="'width:' + (${total} > 0 ? ${entry.value * 100 / total} : 0) + '%'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACCIONES RAPIDAS -->
+        <div class="panel">
+            <div class="panel-header">
+                <h5><i class="bi bi-lightning-charge-fill me-2"></i>Acciones rápidas</h5>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <a th:href="@{/reportes/nuevo}" class="quick-action">
+                        <div class="quick-icon"><i class="bi bi-plus-lg"></i></div>
+                        <div>
+                            <strong>Crear reporte</strong>
+                            <small class="d-block text-muted">Registrar un nuevo daño</small>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a th:href="@{/reportes}" class="quick-action">
+                        <div class="quick-icon"><i class="bi bi-file-earmark-text"></i></div>
+                        <div>
+                            <strong>Ver reportes</strong>
+                            <small class="d-block text-muted">Consultar reportes registrados</small>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a th:href="@{/usuarios/nuevo}" class="quick-action">
+                        <div class="quick-icon"><i class="bi bi-person-plus"></i></div>
+                        <div>
+                            <strong>Crear usuario</strong>
+                            <small class="d-block text-muted">Registrar un nuevo usuario</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </section>
+</main>
+
+</body>
+</html>
