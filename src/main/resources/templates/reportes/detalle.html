@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Detalle Reporte | Reporte Daños</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+</head>
+<body>
+
+<nav class="navbar">
+    <a class="navbar-brand" th:href="@{/}">🔧 Reporte Daños</a>
+    <div class="navbar-links">
+        <a th:href="@{/reportes}">Reportes</a>
+        <a th:href="@{/reportes/nuevo}">Nuevo Reporte</a>
+        <a th:href="@{/usuarios}">Usuarios</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="page-header">
+        <h1>🔍 Detalle del Reporte</h1>
+        <a th:href="@{/reportes}" class="btn btn-secondary">← Volver</a>
+    </div>
+
+    <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
+    <div th:if="${error}"   class="alert alert-error"   th:text="${error}"></div>
+
+    <div class="detalle-card">
+
+        <div class="detalle-header">
+            <h2 th:text="${reporte.ubicacion.descripcion()}">Ubicacion</h2>
+            <!-- Estado -->
+            <span th:with="est=${reporte.estado.class.simpleName}"
+                  th:classappend="${est == 'EstadoPendiente'   ? 'badge-pendiente'   :
+                                    est == 'EstadoEnRevision'  ? 'badge-revision'    :
+                                    est == 'EstadoEnProceso'   ? 'badge-proceso'     :
+                                    est == 'EstadoSolucionado' ? 'badge-solucionado' :
+                                                                  'badge-cerrado'}"
+                  class="badge"
+                  style="margin-top:0.5rem; display:inline-block;"
+                  th:text="${est == 'EstadoPendiente'   ? 'Pendiente'   :
+                              est == 'EstadoEnRevision'  ? 'En Revisión' :
+                              est == 'EstadoEnProceso'   ? 'En Proceso'  :
+                              est == 'EstadoSolucionado' ? 'Solucionado' :
+                                                           'Cerrado'}">
+                Estado
+            </span>
+        </div>
+
+        <div class="detalle-body">
+
+            <div class="detalle-fila">
+                <span class="detalle-label">Categoría</span>
+                <span class="detalle-valor" th:text="${reporte.categoria.name().replace('_', ' ')}">cat</span>
+            </div>
+
+            <div class="detalle-fila">
+                <span class="detalle-label">Prioridad</span>
+                <span th:classappend="${reporte.prioridad.name() == 'ALTA'  ? 'badge-alta'  :
+                                       reporte.prioridad.name() == 'MEDIA' ? 'badge-media' :
+                                                                              'badge-baja'}"
+                      class="badge detalle-valor"
+                      th:text="${reporte.prioridad.name()}">prioridad</span>
+            </div>
+
+            <div class="detalle-fila">
+                <span class="detalle-label">Descripción</span>
+                <span class="detalle-valor" th:text="${reporte.descripcion}">desc</span>
+            </div>
+
+            <div class="detalle-fila">
+                <span class="detalle-label">Creado por</span>
+                <span class="detalle-valor" th:text="${reporte.creador.nombre}">creador</span>
+            </div>
+
+            <div class="detalle-fila">
+                <span class="detalle-label">Responsable</span>
+                <span class="detalle-valor"
+                      th:text="${reporte.responsable != null ? reporte.responsable.nombre : 'Sin asignar'}">
+                    responsable
+                </span>
+            </div>
+
+            <div class="detalle-fila">
+                <span class="detalle-label">Fecha creación</span>
+                <span class="detalle-valor"
+                      th:text="${#temporals.format(reporte.fechaCreacion, 'dd/MM/yyyy HH:mm')}">fecha</span>
+            </div>
+
+            <div class="detalle-fila" th:if="${reporte.solucion != null}">
+                <span class="detalle-label">Solución</span>
+                <span class="detalle-valor" th:text="${reporte.solucion}">solucion</span>
+            </div>
+
+        </div>
+
+        <!-- Acciones segun el estado -->
+        <div class="acciones-seccion">
+            <h4>Acciones disponibles</h4>
+
+            <!-- Pendiente -> iniciar revision -->
+            <th:block th:with="est=${reporte.estado.class.simpleName}">
+
+                <form th:if="${est == 'EstadoPendiente'}"
+                      th:action="@{/reportes/{id}/revision(id=${reporte.id})}" method="post">
+                    <button type="submit" class="btn btn-warning btn-sm">Iniciar Revisión</button>
+                </form>
+
+                <!-- En revision -> asignar responsable + iniciar proceso -->
+                <th:block th:if="${est == 'EstadoEnRevision'}">
+                    <form th:action="@{/reportes/{id}/responsable(id=${reporte.id})}"
+                          method="post" style="display:flex; gap:0.5rem; align-items:center;">
+                        <select name="responsableId" required style="padding:0.3rem 0.6rem; border-radius:6px; border:1px solid #ddd; font-size:0.85rem;">
+                            <option value="">-- Asignar responsable --</option>
+                            <option th:each="u : ${usuarios}"
+                                    th:value="${u.id}"
+                                    th:text="${u.nombre}">u</option>
+                        </select>
+                        <button type="submit" class="btn btn-warning btn-sm">Asignar</button>
+                    </form>
+
+                    <form th:if="${reporte.responsable != null}"
+                          th:action="@{/reportes/{id}/proceso(id=${reporte.id})}" method="post">
+                        <button type="submit" class="btn btn-primary btn-sm">Iniciar Proceso</button>
+                    </form>
+                </th:block>
+
+                <!-- En proceso -> registrar solucion -->
+                <th:block th:if="${est == 'EstadoEnProceso'}">
+                    <form th:action="@{/reportes/{id}/solucion(id=${reporte.id})}"
+                          method="post" style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+                        <input type="text" name="descripcionSolucion"
+                               placeholder="Describe la solución..." required
+                               style="padding:0.3rem 0.6rem; border-radius:6px; border:1px solid #ddd;
+                                      font-size:0.85rem; min-width:250px;"/>
+                        <button type="submit" class="btn btn-success btn-sm">Registrar Solución</button>
+                    </form>
+                </th:block>
+
+                <!-- Solucionado -> cerrar -->
+                <form th:if="${est == 'EstadoSolucionado'}"
+                      th:action="@{/reportes/{id}/cerrar(id=${reporte.id})}" method="post">
+                    <button type="submit" class="btn btn-danger btn-sm">Cerrar Reporte</button>
+                </form>
+
+                <!-- Cerrado -->
+                <span th:if="${est == 'EstadoCerrado'}" style="color:#aaa; font-size:0.88rem;">
+                    Este reporte está cerrado y archivado.
+                </span>
+
+            </th:block>
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Inicio | Reporte Daños</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+    <style>
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem 3rem;
+        }
+        .hero h1 {
+            font-size: 2.2rem;
+            color: #1a1a2e;
+            margin-bottom: 0.8rem;
+        }
+        .hero p {
+            color: #666;
+            font-size: 1.05rem;
+            max-width: 520px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+        .hero-btns {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 2.5rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+        }
+        .stat-numero {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #e94560;
+        }
+        .stat-label {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a class="navbar-brand" th:href="@{/}">🔧 Reporte Daños</a>
+    <div class="navbar-links">
+        <a th:href="@{/reportes}">Reportes</a>
+        <a th:href="@{/reportes/nuevo}">Nuevo Reporte</a>
+        <a th:href="@{/usuarios}">Usuarios</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="hero">
+        <h1>🏫 Sistema de Reportes de Daños</h1>
+        <p>Registra, da seguimiento y cierra los reportes de daños en las instalaciones de la universidad.</p>
+        <div class="hero-btns">
+            <a th:href="@{/reportes/nuevo}" class="btn btn-primary">+ Crear Reporte</a>
+            <a th:href="@{/reportes}" class="btn btn-secondary">Ver Reportes</a>
+        </div>
+    </div>
+
+    <!-- Estadisticas rapidas -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-numero" th:text="${total}">0</div>
+            <div class="stat-label">Total reportes</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-numero" th:text="${pendientes}">0</div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-numero" th:text="${enProceso}">0</div>
+            <div class="stat-label">En proceso</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-numero" th:text="${cerrados}">0</div>
+            <div class="stat-label">Cerrados</div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

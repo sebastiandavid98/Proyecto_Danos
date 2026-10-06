@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Reportes | Reporte Daños</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+</head>
+<body>
+
+<nav class="navbar">
+    <a class="navbar-brand" th:href="@{/}">🔧 Reporte Daños</a>
+    <div class="navbar-links">
+        <a th:href="@{/reportes}">Reportes</a>
+        <a th:href="@{/reportes/nuevo}">Nuevo Reporte</a>
+        <a th:href="@{/usuarios}">Usuarios</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <!-- Mensaje de exito o error -->
+    <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+    <div class="page-header">
+        <h1>📋 Reportes de Daños</h1>
+        <a th:href="@{/reportes/nuevo}" class="btn btn-primary">+ Nuevo Reporte</a>
+    </div>
+
+    <!-- Sin reportes -->
+    <div th:if="${#lists.isEmpty(reportes)}" class="empty-state">
+        <p>No hay reportes registrados todavía.</p>
+        <a th:href="@{/reportes/nuevo}" class="btn btn-primary">Crear el primero</a>
+    </div>
+
+    <!-- Grid de tarjetas -->
+    <div class="cards-grid" th:unless="${#lists.isEmpty(reportes)}">
+        <div class="card" th:each="reporte : ${reportes}">
+
+            <div class="card-header">
+                <h3 th:text="${reporte.ubicacion.descripcion()}">Ubicacion</h3>
+                <!-- Badge de estado -->
+                <span th:with="est=${reporte.estado.class.simpleName}"
+                      th:classappend="${est == 'EstadoPendiente'   ? 'badge-pendiente'   :
+                                        est == 'EstadoEnRevision'  ? 'badge-revision'    :
+                                        est == 'EstadoEnProceso'   ? 'badge-proceso'     :
+                                        est == 'EstadoSolucionado' ? 'badge-solucionado' :
+                                                                      'badge-cerrado'}"
+                      class="badge"
+                      th:text="${est == 'EstadoPendiente'   ? 'Pendiente'   :
+                                  est == 'EstadoEnRevision'  ? 'En Revisión' :
+                                  est == 'EstadoEnProceso'   ? 'En Proceso'  :
+                                  est == 'EstadoSolucionado' ? 'Solucionado' :
+                                                               'Cerrado'}">
+                    Estado
+                </span>
+            </div>
+
+            <div class="card-body">
+                <p><strong>Categoría:</strong>
+                    <span th:text="${reporte.categoria.name().replace('_', ' ')}">cat</span>
+                </p>
+                <p><strong>Descripción:</strong>
+                    <span th:text="${#strings.abbreviate(reporte.descripcion, 80)}">desc</span>
+                </p>
+                <p><strong>Prioridad:</strong>
+                    <span th:classappend="${reporte.prioridad.name() == 'ALTA'  ? 'badge-alta'  :
+                                           reporte.prioridad.name() == 'MEDIA' ? 'badge-media' :
+                                                                                  'badge-baja'}"
+                          class="badge"
+                          th:text="${reporte.prioridad.name()}">prioridad</span>
+                </p>
+                <p><strong>Creado por:</strong>
+                    <span th:text="${reporte.creador.nombre}">usuario</span>
+                </p>
+                <p><strong>Fecha:</strong>
+                    <span th:text="${#temporals.format(reporte.fechaCreacion, 'dd/MM/yyyy HH:mm')}">fecha</span>
+                </p>
+            </div>
+
+            <div class="card-footer">
+                <a th:href="@{/reportes/{id}(id=${reporte.id})}" class="btn btn-secondary btn-sm">Ver detalle</a>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
